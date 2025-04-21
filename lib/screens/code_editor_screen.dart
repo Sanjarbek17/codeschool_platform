@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:codeschool_platform/services/code_execution_service.dart';
+import 'package:flutter_highlight/themes/monokai-sublime.dart';
+import 'package:highlight/languages/python.dart';
+import 'package:flutter_code_editor/flutter_code_editor.dart';
 
 class CodeEditorScreen extends StatefulWidget {
   final CodeExecutionService codeExecutionService;
@@ -11,9 +14,24 @@ class CodeEditorScreen extends StatefulWidget {
 }
 
 class _CodeEditorScreenState extends State<CodeEditorScreen> {
-  final TextEditingController _codeController = TextEditingController();
+  late final CodeController _codeController;
   String _output = '';
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _codeController = CodeController(
+      text: '',
+      language: python, // Specify the language for syntax highlighting
+    );
+  }
+
+  @override
+  void dispose() {
+    _codeController.dispose();
+    super.dispose();
+  }
 
   Future<void> _executeCode() async {
     setState(() {
@@ -47,13 +65,10 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
         child: Column(
           children: [
             Expanded(
-              child: TextField(
-                controller: _codeController,
-                maxLines: null,
-                expands: true,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Write your code here...',
+              child: CodeTheme(
+                data: CodeThemeData(styles: monokaiSublimeTheme),
+                child: SingleChildScrollView(
+                  child: CodeField(controller: _codeController),
                 ),
               ),
             ),
