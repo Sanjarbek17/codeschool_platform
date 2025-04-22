@@ -102,6 +102,67 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
               ],
             ),
             const SizedBox(height: 16),
+            Container(
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.grey[300], // Change header background color
+                borderRadius: BorderRadius.circular(4.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: Offset(0, -3), // Add upper shadow
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12.0),
+                    decoration: BoxDecoration(
+                      color:
+                          Colors.white, // Change header text background color
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(4.0),
+                        topRight: Radius.circular(4.0),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: Offset(0, 3), // Add shadow
+                        ),
+                      ],
+                    ),
+                    child: const Text(
+                      'main.py',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4.0),
+                    ),
+                    child: IconButton(
+                      splashColor: Colors.transparent,
+                      icon: const Icon(Icons.add),
+                      onPressed: () {
+                        setState(() {
+                          _codeController.text += '**2';
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
             Expanded(
               child: GestureDetector(
                 onTap: () {
@@ -116,7 +177,7 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
                         color: Colors.grey.withOpacity(0.5),
                         spreadRadius: 2,
                         blurRadius: 5,
-                        offset: Offset(0, 3), // Match CodeField shadow
+                        offset: Offset(0, 3), // Remove upper shadow
                       ),
                     ],
                   ),
