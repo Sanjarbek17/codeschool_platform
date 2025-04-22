@@ -21,7 +21,22 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
   final CodeController _codeController = CodeController(
     text: '',
     language: python,
+    // patternMap: {
+    //   r'".*?"': TextStyle(color: Colors.green), // Example for string literals
+    // },
   );
+
+  @override
+  void initState() {
+    super.initState();
+    // _codeController.addListener(() {
+    //   final textSelection = _codeController.selection;
+    //   if (!textSelection.isValid) {
+    //     // Handle invalid selection gracefully
+    //     print('it is not valid');
+    //   }
+    // });
+  }
 
   @override
   void dispose() {
