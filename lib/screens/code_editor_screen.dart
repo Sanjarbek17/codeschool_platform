@@ -66,7 +66,7 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
       body: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: MediaQuery.of(context).size.width / 6,
-          vertical: 60.0,
+          vertical: 20.0,
         ),
         child: Column(
           children: [
@@ -103,11 +103,14 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
             Container(
               height: 40,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: Theme.of(context).colorScheme.surfaceBright,
                 borderRadius: BorderRadius.circular(4.0),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
+                    color:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Colors.transparent
+                            : Colors.grey.withOpacity(0.5),
                     spreadRadius: 2,
                     blurRadius: 5,
                     offset: Offset(0, -3),
@@ -119,14 +122,17 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
                   Container(
                     padding: const EdgeInsets.all(12.0),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.surfaceBright,
                       borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(4.0),
                         topRight: Radius.circular(4.0),
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
+                          color:
+                              Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.transparent
+                                  : Colors.grey.withOpacity(0.5),
                           spreadRadius: 2,
                           blurRadius: 5,
                           offset: Offset(0, 3),
@@ -144,7 +150,7 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
                   Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.rectangle,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.surfaceBright,
                       borderRadius: BorderRadius.circular(4.0),
                     ),
                     child: IconButton(
@@ -159,6 +165,7 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
               ),
             ),
             Expanded(
+              flex: 2,
               child: GestureDetector(
                 onTap: () {
                   _codeFieldFocusNode.requestFocus();
@@ -166,10 +173,13 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
                 child: Container(
                   padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
+                        color:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Colors.transparent
+                                : Colors.grey.withOpacity(0.5),
                         spreadRadius: 2,
                         blurRadius: 5,
                         offset: Offset(0, 3),
@@ -177,17 +187,29 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
                     ],
                   ),
                   child: CodeTheme(
-                    data: CodeThemeData(styles: monokaiSublimeTheme),
+                    data: CodeThemeData(
+                      styles:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? monokaiSublimeTheme
+                              : {
+                                ...monokaiSublimeTheme,
+                                'root': TextStyle(
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.surface,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                              },
+                    ),
                     child: SingleChildScrollView(
                       child: CodeField(
                         controller: _codeController,
                         focusNode: _codeFieldFocusNode,
-                        background: Colors.white,
+                        background: Theme.of(context).colorScheme.surface,
                         textStyle: TextStyle(
-                          color: Theme.of(context).textTheme.bodyLarge?.color,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
-                        cursorColor:
-                            Theme.of(context).textTheme.bodyLarge?.color,
+                        cursorColor: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ),
