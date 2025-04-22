@@ -5,6 +5,7 @@ import 'package:highlight/languages/python.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
+import '../providers/code_runner_provider.dart';
 
 class CodeEditorScreen extends StatefulWidget {
   final CodeExecutionService codeExecutionService;
@@ -17,6 +18,10 @@ class CodeEditorScreen extends StatefulWidget {
 
 class _CodeEditorScreenState extends State<CodeEditorScreen> {
   final FocusNode _codeFieldFocusNode = FocusNode();
+  final CodeController _codeController = CodeController(
+    text: '',
+    language: python,
+  );
 
   @override
   void dispose() {
@@ -26,6 +31,8 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final codeRunnerProvider = Provider.of<CodeRunnerProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Code Editor'),
@@ -144,7 +151,7 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
                 child: Container(
                   padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
+                    color: Colors.white,
                     boxShadow: [
                       BoxShadow(
                         color: Colors.grey.withOpacity(0.5),
@@ -158,9 +165,9 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
                     data: CodeThemeData(styles: monokaiSublimeTheme),
                     child: SingleChildScrollView(
                       child: CodeField(
-                        controller: CodeController(text: '', language: python),
+                        controller: _codeController,
                         focusNode: _codeFieldFocusNode,
-                        background: Theme.of(context).scaffoldBackgroundColor,
+                        background: Colors.white,
                         textStyle: TextStyle(
                           color: Theme.of(context).textTheme.bodyLarge?.color,
                         ),
@@ -174,10 +181,16 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () {
-                // Handle run code action
-              },
-              child: const Text('Run Code'),
+              onPressed:
+                  codeRunnerProvider.isRunning
+                      ? null
+                      : () {
+                        codeRunnerProvider.runCode(_codeController.text);
+                      },
+              child:
+                  codeRunnerProvider.isRunning
+                      ? const CircularProgressIndicator()
+                      : const Text('Run Code'),
             ),
             const SizedBox(height: 16),
             Expanded(
@@ -189,7 +202,7 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
                   borderRadius: BorderRadius.circular(4.0),
                 ),
                 child: SingleChildScrollView(
-                  child: Text('Output will be displayed here'),
+                  child: Text(codeRunnerProvider.output),
                 ),
               ),
             ),

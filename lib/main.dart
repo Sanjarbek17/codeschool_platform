@@ -4,11 +4,17 @@ import 'package:codeschool_platform/services/code_execution_service.dart';
 import 'package:codeschool_platform/constants.dart';
 import 'package:provider/provider.dart';
 import 'providers/theme_provider.dart';
+import 'providers/code_runner_provider.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(
+          create: (_) => CodeRunnerProvider(CodeExecutionService()),
+        ),
+      ],
       child: const MyApp(),
     ),
   );
