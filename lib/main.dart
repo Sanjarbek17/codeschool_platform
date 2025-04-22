@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:codeschool_platform/screens/code_editor_screen.dart';
 import 'package:codeschool_platform/services/code_execution_service.dart';
+import 'package:codeschool_platform/constants.dart';
+import 'package:provider/provider.dart';
+import 'providers/theme_provider.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -11,9 +19,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return MaterialApp(
       title: 'Code Editor',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      debugShowCheckedModeBanner: false,
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: themeProvider.themeMode,
       home: CodeEditorScreen(codeExecutionService: CodeExecutionService()),
     );
   }

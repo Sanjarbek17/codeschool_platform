@@ -3,6 +3,8 @@ import 'package:codeschool_platform/services/code_execution_service.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import 'package:highlight/languages/python.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
+import 'package:provider/provider.dart';
+import '../providers/theme_provider.dart';
 
 class CodeEditorScreen extends StatefulWidget {
   final CodeExecutionService codeExecutionService;
@@ -14,57 +16,31 @@ class CodeEditorScreen extends StatefulWidget {
 }
 
 class _CodeEditorScreenState extends State<CodeEditorScreen> {
-  late final CodeController _codeController;
-  late final FocusNode _codeFocusNode; // Add a FocusNode for the CodeField
-  String _output = '';
-  bool _isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _codeFocusNode = FocusNode(); // Initialize the FocusNode
-    _codeController = CodeController(
-      text: '',
-      language: python, // Specify the language for syntax highlighting
-    );
-  }
+  final FocusNode _codeFieldFocusNode = FocusNode();
 
   @override
   void dispose() {
-    _codeFocusNode.dispose(); // Dispose of the FocusNode
-    _codeController.dispose();
+    _codeFieldFocusNode.dispose();
     super.dispose();
-  }
-
-  Future<void> _executeCode() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final result = await widget.codeExecutionService.executeCode(
-        _codeController.text,
-      );
-      setState(() {
-        _output = result['output'] ?? 'No output';
-      });
-    } catch (e) {
-      setState(() {
-        _output = 'Error: $e';
-      });
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Code Editor')),
-      backgroundColor:
-          Colors.grey[200], // Change scaffold background color to light grey
+      appBar: AppBar(
+        title: Text('Code Editor'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.brightness_6),
+            onPressed: () {
+              Provider.of<ThemeProvider>(
+                context,
+                listen: false,
+              ).toggleThemeMode();
+            },
+          ),
+        ],
+      ),
       body: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: MediaQuery.of(context).size.width / 6,
@@ -105,14 +81,14 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
             Container(
               height: 40,
               decoration: BoxDecoration(
-                color: Colors.grey[300], // Change header background color
+                color: Colors.grey[300],
                 borderRadius: BorderRadius.circular(4.0),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 2,
                     blurRadius: 5,
-                    offset: Offset(0, -3), // Add upper shadow
+                    offset: Offset(0, -3),
                   ),
                 ],
               ),
@@ -121,8 +97,7 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
                   Container(
                     padding: const EdgeInsets.all(12.0),
                     decoration: BoxDecoration(
-                      color:
-                          Colors.white, // Change header text background color
+                      color: Colors.white,
                       borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(4.0),
                         topRight: Radius.circular(4.0),
@@ -132,7 +107,7 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
                           color: Colors.grey.withOpacity(0.5),
                           spreadRadius: 2,
                           blurRadius: 5,
-                          offset: Offset(0, 3), // Add shadow
+                          offset: Offset(0, 3),
                         ),
                       ],
                     ),
@@ -154,9 +129,7 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
                       splashColor: Colors.transparent,
                       icon: const Icon(Icons.add),
                       onPressed: () {
-                        setState(() {
-                          _codeController.text += '**2';
-                        });
+                        // Handle add action
                       },
                     ),
                   ),
@@ -166,18 +139,18 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
             Expanded(
               child: GestureDetector(
                 onTap: () {
-                  FocusScope.of(context).requestFocus(_codeFocusNode);
+                  _codeFieldFocusNode.requestFocus();
                 },
                 child: Container(
                   padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.white, // Match CodeField background color
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     boxShadow: [
                       BoxShadow(
                         color: Colors.grey.withOpacity(0.5),
                         spreadRadius: 2,
                         blurRadius: 5,
-                        offset: Offset(0, 3), // Remove upper shadow
+                        offset: Offset(0, 3),
                       ),
                     ],
                   ),
@@ -185,14 +158,14 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
                     data: CodeThemeData(styles: monokaiSublimeTheme),
                     child: SingleChildScrollView(
                       child: CodeField(
-                        focusNode: _codeFocusNode,
-                        controller: _codeController,
-                        background:
-                            Colors.white, // Set background color to white
-                        textStyle: const TextStyle(
-                          color: Colors.black,
-                        ), // Set text color to black
-                        cursorColor: Colors.black, // Set cursor color to black
+                        controller: CodeController(text: '', language: python),
+                        focusNode: _codeFieldFocusNode,
+                        background: Theme.of(context).scaffoldBackgroundColor,
+                        textStyle: TextStyle(
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
+                        ),
+                        cursorColor:
+                            Theme.of(context).textTheme.bodyLarge?.color,
                       ),
                     ),
                   ),
@@ -201,11 +174,10 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: _isLoading ? null : _executeCode,
-              child:
-                  _isLoading
-                      ? const CircularProgressIndicator()
-                      : const Text('Run Code'),
+              onPressed: () {
+                // Handle run code action
+              },
+              child: const Text('Run Code'),
             ),
             const SizedBox(height: 16),
             Expanded(
@@ -216,12 +188,45 @@ class _CodeEditorScreenState extends State<CodeEditorScreen> {
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(4.0),
                 ),
-                child: SingleChildScrollView(child: Text(_output)),
+                child: SingleChildScrollView(
+                  child: Text('Output will be displayed here'),
+                ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  static _MyAppState of(BuildContext context) =>
+      context.findAncestorStateOfType<_MyAppState>()!;
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  void toggleThemeMode() {
+    setState(() {
+      _themeMode =
+          _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      themeMode: _themeMode,
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      home: CodeEditorScreen(codeExecutionService: CodeExecutionService()),
     );
   }
 }
